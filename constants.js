@@ -1,5 +1,3 @@
-const rectTarps = [rectangle.rect1to2, rectangle.rect2to3, rectangle.rect3to4, rectangle.rect3to5, rectangle.rect4to5, rectangle.rectOdd];
-
 // It appears sitTarpHt and chairTarpHt are the same for many configs
 // Consider global var for diagonal = 2 * len * len
 
@@ -138,7 +136,7 @@ const bwfr_LT25 = {
     return Math.round(Math.cos(angle * deg2Rad) * (wid * 0.5) + wid * 0.25);
   },
   ridgeHeight(angle) {
-    return Math.round(Math.sin(angle * deg2Rad) * (wid * 0.5));
+    return Math.round(Math.sin(angle * deg2Rad) * (wid * 0.5) + wid * 0.25);
   },
   sitTarpHt(angle) {
     return Math.round(Math.tan(angle * deg2Rad) * sitCover);
@@ -179,7 +177,7 @@ const aframe = {
     return Math.round(Math.cos(angle * deg2Rad) * wid);
   },
   ridgeHeight(angle) {
-    return Math.round((Math.sin(angle * deg2Rad) * wid) / 2);
+    return Math.round(Math.sin(angle * deg2Rad) * (wid * 0.5));
   },
   sitTarpHt(angle) {
     return Math.round(Math.tan(angle * deg2Rad) * sitCover);
@@ -216,6 +214,7 @@ const aframe_LT75 = {
   tarpTypes: [square, rectangle],
   sleepClear: len - height,
   cover(angle) {
+    // Wrong, s\b Math.round(Math.cos(i * deg2Rad) * wid); same as A-frame
     return Math.round(Math.cos(angle * deg2Rad) * wid * 0.75 + Math.cos(angle * deg2Rad) * wid * 0.25);
   },
   ridgeHeight(angle) {
@@ -236,6 +235,7 @@ const aframe_LT67 = {
   tarpTypes: [square, rectangle],
   sleepClear: len - height,
   cover(angle) {
+    // Wrong, s\b Math.round(Math.cos(i * deg2Rad) * wid); same as A-frame
     return Math.round(Math.cos(angle * deg2Rad) * wid * 0.667 + Math.cos(angle * deg2Rad) * wid * 0.333);
   },
   ridgeHeight(angle) {
@@ -256,6 +256,7 @@ const open_stall = {
   tarpTypes: [square, rectangle],
   sleepClear: len - height,
   cover(angle) {
+    // not 0.333 *2, but 0.667
     return Math.round(Math.cos(angle * deg2Rad) * wid * 0.333 * 2);
   },
   ridgeHeight(angle) {
@@ -360,7 +361,7 @@ const plow_point = {
   sleepClear(angle) {
     return Math.round(Math.cos(angle * deg2Rad) * Math.sqrt(2 * len * len) - height);
   },
-  // Is cover correct?
+  // Is cover correct? NO!
   cover(angle) {
     return Math.round(Math.cos(angle * deg2Rad) * len * 2);
   },
@@ -408,7 +409,7 @@ const diamond = {
     return Math.round(Math.sqrt(2 * len * len) - height);
   },
   cover(angle) {
-    return Math.round(Math.cos(angle * deg2Rad) * Math.sqrt(2 * len * len)) * 2;
+    return Math.round(Math.cos(angle * deg2Rad) * Math.sqrt(2 * len * len) * 2);
   },
   ridgeHeight(angle) {
     return Math.round((Math.sin(angle * deg2Rad) * Math.sqrt(2 * len * len)) / 2);
@@ -444,7 +445,7 @@ const hex_diamond = {
   }
 };
 
-const hafl_cone = {
+const half_cone = {
   configName: "Half Cone Fly 22.5",
   type: "Diagonal",
   angles: [22.5],

@@ -92,31 +92,23 @@ const configType = "Lean-To";
 const configAngles = [30, 60];
 
 let subset = [];
-let outputObj = [];
-let finalObj = [];
+let subset2 = [];
+let sleepClr = 0;
 
-let sleepClr,
-  cover,
-  ridgeHeight,
-  sitCover,
-  sitTarpHt,
-  sitTarpHtClear,
-  chairCover,
-  chairTarpHt,
-  chairTarpHtClear = 0;
-
-/* how can I change these to forEach and map? */
-
+// Calculate sleep clearance and output tarps with len + 4 > height
 for (let i = 0; i < allTarps.length; i++) {
   for (let j = 0; j < allTarps[i].tarpSizes.length; j++) {
     let len = allTarps[i]["tarpSizes"][j][0];
     sleepClr = len * 12 - height;
 
     if (sleepClr > 4) {
-      if (allTarps[i]["tarpSizes"].indexOf(allTarps[i]["tarpSizes"][j]) && !subset.includes(allTarps[i]["tarpSizes"][j])) {
-        subset.push(allTarps[i]["tarpSizes"][j]);
+      let tarpType = allTarps[i]["tarpCategory"] + " " + allTarps[i]["tarpRatio"];
 
-        // Should I push the category and ratio, and so make it an object and make changes in the forEach below?
+      if (allTarps[i]["tarpSizes"].indexOf(allTarps[i]["tarpSizes"][j]) && !subset.includes(allTarps[i]["tarpSizes"][j])) {
+        subset.push([allTarps[i]["tarpSizes"][j], tarpType]);
+        // subset2.push(allTarps[i]["tarpSizes"][j]);
+
+        // subset2 may be the better option, just grab the ratio and category at the end
 
         /* I commented the break out because I want "all" the allTarps */
         // if (allTarps[i].includes(subset[i])) {
@@ -127,34 +119,49 @@ for (let i = 0; i < allTarps.length; i++) {
   }
 }
 console.log("subset: ", subset);
+// console.log(allTarps);
 
+let outputObj = [];
+let finalObj = [];
+
+let cover,
+  ridgeHeight,
+  sitTarpHtClear,
+  chairTarpHtClear = 0;
+
+// may need another for loop instead of forEach
 subset.forEach(item => {
-  let wid = item[1] * 12;
-  let len = item[0] * 12;
+  let len = item[0][0] * 12;
+  let wid = item[0][1] * 12;
 
   for (let i = configAngles[1]; i >= configAngles[0]; i--) {
     let sleepClear = len - height;
 
-    ridgeHt = Math.round(Math.sin(i * deg2Rad) * wid);
-    // ridgeHeight = Math.round(Math.sin(i * deg2Rad) * wid);
+    ridgeHt = Math.trunc(Math.round(Math.sin(i * deg2Rad) * wid));
+
+    // Have to reduce the ridgeline height for really big tarps
     ridgeHeight = Math.min(ridgeHt, height + 6);
 
-    cover = Math.round(Math.cos(i * deg2Rad) * wid);
+    // Calculate different "cover" values based on the 2 ridgeHeight calcs
+    if (ridgeHeight === height + 6) {
+      cover = Math.round(Math.sqrt(Math.pow(wid, 2) - Math.pow(ridgeHeight, 2)));
+    } else {
+      cover = Math.round(Math.cos(i * deg2Rad) * wid);
+    }
 
-    // **** NEED TO RECALC THESE 2, & following 4, IF ridgeHeight = height + 6
-    sitCover = Math.round(cover - (sitDepth + 3));
-    chairCover = Math.round(cover - (chairDepth + 3));
+    let sitCover = Math.round(cover - (sitDepth + 3));
+    let chairCover = Math.round(cover - (chairDepth + 3));
 
-    sitTarpHt = Math.round(Math.tan(i * deg2Rad) * sitCover);
-    chairTarpHt = Math.round(Math.tan(i * deg2Rad) * chairCover);
+    let sitTarpHt = Math.round(Math.tan(i * deg2Rad) * sitCover);
+    let chairTarpHt = Math.round(Math.tan(i * deg2Rad) * chairCover);
 
     sitTarpHtClear = sitTarpHt - sitHeight;
     chairTarpHtClear = chairTarpHt - chairHeight;
 
-    // Changing the # gives a different angle
-    if (sitTarpHtClear > 3) {
-      outputObj = [item].concat({ sleepClear, cover, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: i });
-      // If I do another if statement for redgeHeight = height + 6, then that is another code block, so how do I recalc cover and the vars dependent on it?
+    // Changing the # gives a different angle - this is fucked up, I changed it to 5 which knocked out 7 x 7 but still 21 arrays and no 7x7, 7 x 9 repeats - WTF? forEach?
+    if (sitTarpHtClear > 20) {
+      // outputObj = [item].concat({ sleepClear, cover, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: i, fuck: "fuck" });
+      outputObj = item;
     }
   }
   finalObj.push(outputObj);
@@ -171,3 +178,5 @@ finalObj.forEach(item => {
   }
   // new cover = need new angle as opposite (ridgeheight) / hyp, then use that angle to find cover, then calcualte sitTarpHtClear
 });
+
+// WHENE/WHERE DO I GET TARP TYPES S\A Rectangle 1:2?
