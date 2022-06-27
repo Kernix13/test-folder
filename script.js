@@ -1,60 +1,6 @@
-// I need to import these, they can't be in each config component
-const square = [
-  [5, 5],
-  [6, 6],
-  [7, 7],
-  [8, 8],
-  [9, 9],
-  [10, 10]
-];
+// Consider using this ONLY for all LT configs and A-Frame and Side Wall A-Frame
 
-const rectangle = [
-  {
-    "Rectangle 1:2": [
-      [6, 12],
-      [7, 14],
-      [8, 16],
-      [10, 20]
-    ]
-  },
-  {
-    rect2to3: [
-      [6, 9],
-      [8, 12],
-      [10, 15],
-      [12, 18]
-    ]
-  },
-  {
-    rect3to4: [
-      [6, 8],
-      [9, 12],
-      [12, 16]
-    ]
-  },
-  {
-    rect3to5: [
-      [6, 10],
-      [9, 15],
-      [12, 20]
-    ]
-  },
-  {
-    rect4to5: [
-      [4, 5],
-      [8, 10],
-      [12, 15],
-      [16, 20]
-    ]
-  },
-  {
-    rectOdd: [
-      [5, 7],
-      [7, 9]
-    ]
-  }
-];
-
+// I need this in a separate file by itself and to replace all_tarps.js with changes from arrays indices to objects props
 const allTarps = [
   {
     tarpCategory: "Rectangle",
@@ -129,140 +75,97 @@ const allTarps = [
   }
 ];
 
-console.log(allTarps[0]);
-
-const tarps = [
-  [
-    [6, 12],
-    [7, 14],
-    [8, 16],
-    [9, 18],
-    [10, 20]
-  ],
-  [
-    [6, 10],
-    [9, 15],
-    [12, 20]
-  ],
-  [
-    [6, 9],
-    [8, 12],
-    [10, 15],
-    [12, 18]
-  ],
-  [
-    [6, 8],
-    [9, 12],
-    [12, 16]
-  ],
-  [
-    [4, 5],
-    [8, 10],
-    [12, 15],
-    [16, 20]
-  ],
-  [
-    [5, 7],
-    [7, 9]
-  ],
-  [
-    [5, 5],
-    [6, 6],
-    [7, 7],
-    [8, 8],
-    [9, 9],
-    [10, 10],
-    [12, 12],
-    [15, 15],
-    [20, 20]
-  ]
-];
-// console.log(tarps[1]);
-
-// Global state and variables
+// Global state / variables, have these in index.js in useState and the context provider
 const height = 74;
+const bodyWidth = height * (5 / 16);
 const chairHeight = 46;
-const deg2Rad = Math.PI / 180;
-
-// Calculations based on user's height
-const sitHeight = height / 2;
-const sitDepth = (height * 7) / 32;
 const chairDepth = (height * 13) / 32;
 
-// Configuration constants
+// Calculations based on user's height, have these calcs in index.js
+const sitHeight = height / 2;
+const sitDepth = (height * 7) / 32;
+
+// Degree to radian conversion, have this in index.js
+const deg2Rad = Math.PI / 180;
+
+// Configuration specific constants (remove?)
 const configName = "Lean-To";
 const configType = "Lean-To";
-const configAngles = [30, 45];
-const configTarps = [square, rectangle];
 
-let matches = [];
 let subset = [];
+let sleepClr = 0;
+
 let outputObj = [];
 let finalObj = [];
-let sleepClr = 0;
-for (let i = 0; i < tarps.length; i++) {
-  for (let j = 0; j < tarps[i].length; j++) {
-    let len = tarps[i][j][0];
-    sleepClr = len * 12 - height; // must be > 0
-    if (sleepClr > 4) {
-      // REMOVE MATCHES?
-      matches.push(tarps[i][j]);
-      if (tarps[i].indexOf(tarps[i][j]) && !subset.includes(tarps[i][j])) {
-        subset.push(tarps[i][j]);
 
-        /* I commented the break out because I want "all" the tarps */
-        // if (tarps[i].includes(subset[i])) {
-        //   break;
-        // }
+let cover,
+  coverClear,
+  ridgeHeight,
+  sitTarpHtClear,
+  chairTarpHtClear = 0;
+
+// THIS DOES NOT CHANGE EXCEPT FOR A FEW CONFIGS: I will need a different component for when the code block below changes
+
+// Calculate sleep clearance and output tarps with len + 4 > height
+for (let i = 0; i < allTarps.length; i++) {
+  for (let j = 0; j < allTarps[i].tarpSizes.length; j++) {
+    let len = allTarps[i]["tarpSizes"][j][0];
+    sleepClr = len * 12 - height;
+
+    if (sleepClr > 4) {
+      let tarpType = allTarps[i]["tarpCategory"] + " " + allTarps[i]["tarpRatio"];
+
+      if (allTarps[i]["tarpSizes"].indexOf(allTarps[i]["tarpSizes"][j]) && !subset.includes(allTarps[i]["tarpSizes"][j])) {
+        // Remove tarpType if not needed
+        subset.push([allTarps[i]["tarpSizes"][j], tarpType]);
       }
     }
   }
 }
+console.log("subset: ", subset);
 
-let tarpMatches = [];
-// let angles = [];
-let first = [];
-let ridgeLines = [];
-let tarpAngles = [];
-let importantThings = {};
+// CONFIGURATION ANGLES WILL VARY BY CONFIG CATEGORY
+// I think I need a sub-component folder with the specifics, in the component folder I need this and the code block above, but how do I not have the following code block throw an error when it will have variables standing in for the values which will be in the sub-components?
+const configAngles = [30, 50];
+// const configAngles = [37, 75];
 
-let cover = 0;
-let ridgeHeight = 0;
-let sitCover = 0;
-let sitTarpHt = 0;
-let sitTarpHtClear = 0;
-let chairCover = 0;
-let chairTarpHt = 0;
-let chairTarpHtClear = 0;
-
+// RIDGEHEIGHT AND COVER ARE THE ONLY VALUES THAT CHANGE FOR EACH CONFIG, AND THEY DO CHANGE FOR EVERY CONFIG - HOW TO I PREVERT DUPLICATE CODE?
+// Current config:
+// console.log("Lean-To");
 subset.forEach(item => {
-  let wid = item[1] * 12;
-  let len = item[0] * 12;
+  let len = item[0][0] * 12;
+  let wid = item[0][1] * 12;
+  let sleepClear = len - height;
 
-  for (let angle = configAngles[1]; angle >= configAngles[0]; angle--) {
-    let sleepClear = len - height;
-    cover = Math.round(Math.cos(angle * deg2Rad) * wid);
-    ridgeHt = Math.round(Math.sin(angle * deg2Rad) * wid);
-    // ridgeHeight = Math.round(Math.sin(angle * deg2Rad) * wid);
+  // See top of COMPLETE.md for mults and angles constants
+
+  for (let i = configAngles[1]; i >= configAngles[0]; i--) {
+    ridgeHt = Math.trunc(Math.round(Math.sin(i * deg2Rad) * wid));
+
+    // Reduce the ridgeHeight to (height + 6) for really big tarps
     ridgeHeight = Math.min(ridgeHt, height + 6);
 
-    // **** NEED TO RECALCULATE THESE 3 IF RIDGEHEIGHT = HEIGHT + 6 WHICH MEANS COVER HAS TO BE RECALULATED AS WELL
-    sitCover = Math.round(cover - (sitDepth + 3));
-    sitTarpHt = Math.round(Math.tan(angle * deg2Rad) * sitCover);
-    sitTarpHtClear = sitTarpHt - sitHeight; // must be > 0
+    // Calculate different "cover" values based on the 2 ridgeHeight calcs
+    if (ridgeHeight === height + 6) {
+      cover = Math.round(Math.sqrt(Math.pow(wid, 2) - Math.pow(ridgeHeight, 2)));
+    } else {
+      cover = Math.round(Math.cos(i * deg2Rad) * wid);
+    }
 
-    chairCover = cover - chairDepth;
-    chairTarpHt = Math.round(Math.tan(angle * deg2Rad) * chairCover);
-    chairTarpHtClear = chairTarpHt - chairHeight; // ideally > 0
+    let sitCover = Math.round(cover - (sitDepth + 3));
+    let chairCover = Math.max(Math.round(cover - (chairDepth + 3)), 0);
 
-    // Changing the # gives a different angle
-    if (sitTarpHtClear > 3) {
-      outputObj = [item].concat({ sleepClear, cover, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle });
-      // How do I break when first angle matches requirements?
-      // No I want the smallest angle possible or else the ridgeline will be too high -
-      // if (ridgeHeight > height + 3) {
+    let sitTarpHt = Math.round(Math.tan(i * deg2Rad) * sitCover);
+    let chairTarpHt = Math.round(Math.tan(i * deg2Rad) * chairCover);
 
-      // }
+    coverClear = cover - bodyWidth;
+    sitTarpHtClear = sitTarpHt - sitHeight;
+    chairTarpHtClear = chairTarpHt - chairHeight;
+
+    outputObj = item.concat({ sleepClear, cover, coverClear, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: i });
+
+    if (sitTarpHtClear < 4 || chairTarpHtClear < 4) {
+      break;
     }
   }
   finalObj.push(outputObj);
@@ -270,9 +173,8 @@ subset.forEach(item => {
 // GOT IT!
 console.log(finalObj);
 
-finalObj.forEach(item => {
-  if (item.length !== 0) {
-    console.log(item);
-  }
-  // new cover = need new angle as opposite (ridgeheight) / hyp, then use that angle to find cover, then calcualte sitTarpHtClear
-});
+// finalObj.forEach(item => {
+//   if (!item[2]) {
+//     console.log(item);
+//   }
+// });

@@ -2,7 +2,7 @@
 
 NOTE: ignore this repo - this is where I work on things before adding them to my other repos. I push it from time to time in the event my laptop dies. I do it this way becaue I do not want to clutter up the repos for my projects. Plus, it;s June 16th 2022 and IE ended yesterday. I've been having a lot of problems... so I want to make sure my work is backed-up.
 
-Currently, I am working on my Tarp Configurations project...
+Currently, I am working on my React Tarp Configurations project, however this only has the JavaScript...
 
 ## Tarp Configs TO-DO
 

@@ -1,5 +1,3 @@
-// I need to import these, they can't be in each config component
-
 const allTarps = [
   {
     tarpCategory: "Rectangle",
@@ -74,8 +72,6 @@ const allTarps = [
   }
 ];
 
-// console.log(allTarps[0].tarpSizes);
-
 // Global state and variables
 const height = 74;
 const chairHeight = 46;
@@ -83,18 +79,18 @@ const chairHeight = 46;
 const deg2Rad = Math.PI / 180;
 // Calculations based on user's height
 const sitHeight = height / 2;
+const bodyWidth = height * (5 / 16);
 const sitDepth = (height * 7) / 32;
 const chairDepth = (height * 13) / 32;
 
-// Configuration specific constants
+// Configuration specific constants (remove?)
 const configName = "Lean-To";
 const configType = "Lean-To";
-const configAngles = [30, 60];
 
 let subset = [];
-let subset2 = [];
 let sleepClr = 0;
 
+// Current config:
 // Calculate sleep clearance and output tarps with len + 4 > height
 for (let i = 0; i < allTarps.length; i++) {
   for (let j = 0; j < allTarps[i].tarpSizes.length; j++) {
@@ -105,31 +101,27 @@ for (let i = 0; i < allTarps.length; i++) {
       let tarpType = allTarps[i]["tarpCategory"] + " " + allTarps[i]["tarpRatio"];
 
       if (allTarps[i]["tarpSizes"].indexOf(allTarps[i]["tarpSizes"][j]) && !subset.includes(allTarps[i]["tarpSizes"][j])) {
+        // Remove tarpType if not needed
         subset.push([allTarps[i]["tarpSizes"][j], tarpType]);
-        // subset2.push(allTarps[i]["tarpSizes"][j]);
-
-        // subset2 may be the better option, just grab the ratio and category at the end
-
-        /* I commented the break out because I want "all" the allTarps */
-        // if (allTarps[i].includes(subset[i])) {
-        //   break;
-        // }
       }
     }
   }
 }
 console.log("subset: ", subset);
-// console.log(allTarps);
+
+// const configAngles = [30, 50];
+const configAngles = [37, 75];
 
 let outputObj = [];
 let finalObj = [];
 
 let cover,
+  coverClear,
   ridgeHeight,
   sitTarpHtClear,
   chairTarpHtClear = 0;
 
-// may need another for loop instead of forEach
+// Current config:
 subset.forEach(item => {
   let len = item[0][0] * 12;
   let wid = item[0][1] * 12;
@@ -137,9 +129,9 @@ subset.forEach(item => {
   for (let i = configAngles[1]; i >= configAngles[0]; i--) {
     let sleepClear = len - height;
 
-    ridgeHt = Math.trunc(Math.round(Math.sin(i * deg2Rad) * wid));
+    ridgeHt = Math.trunc(Math.round(Math.sin(i * deg2Rad) * (wid * 0.5)));
 
-    // Have to reduce the ridgeline height for really big tarps
+    // Reduce the ridgeHeight to (height + 6) for really big tarps
     ridgeHeight = Math.min(ridgeHt, height + 6);
 
     // Calculate different "cover" values based on the 2 ridgeHeight calcs
@@ -149,19 +141,15 @@ subset.forEach(item => {
       cover = Math.round(Math.cos(i * deg2Rad) * wid);
     }
 
-    let sitCover = Math.round(cover - (sitDepth + 3));
-    let chairCover = Math.round(cover - (chairDepth + 3));
+    coverClear = cover - bodyWidth;
+    sitTarpHtClear = ridgeHeight - sitHeight;
+    chairTarpHtClear = ridgeHeight - chairHeight;
 
-    let sitTarpHt = Math.round(Math.tan(i * deg2Rad) * sitCover);
-    let chairTarpHt = Math.round(Math.tan(i * deg2Rad) * chairCover);
+    outputObj = item.concat({ sleepClear, cover, coverClear, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: i });
 
-    sitTarpHtClear = sitTarpHt - sitHeight;
-    chairTarpHtClear = chairTarpHt - chairHeight;
-
-    // Changing the # gives a different angle - this is fucked up, I changed it to 5 which knocked out 7 x 7 but still 21 arrays and no 7x7, 7 x 9 repeats - WTF? forEach?
-    if (sitTarpHtClear > 20) {
-      // outputObj = [item].concat({ sleepClear, cover, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: i, fuck: "fuck" });
-      outputObj = item;
+    // Change the # to < 7 for A-Frame?
+    if (sitTarpHtClear < 4 || chairTarpHtClear < 4) {
+      break;
     }
   }
   finalObj.push(outputObj);
@@ -169,14 +157,8 @@ subset.forEach(item => {
 // GOT IT!
 console.log(finalObj);
 
-// forEach is not good for this
-finalObj.forEach(item => {
-  let finalOutput = [];
-  if (item.length !== 0) {
-    finalOutput.push(item);
-    // console.log(item);
-  }
-  // new cover = need new angle as opposite (ridgeheight) / hyp, then use that angle to find cover, then calcualte sitTarpHtClear
-});
-
-// WHENE/WHERE DO I GET TARP TYPES S\A Rectangle 1:2?
+// finalObj.forEach(item => {
+//   if (!item[2]) {
+//     console.log(item);
+//   }
+// });
