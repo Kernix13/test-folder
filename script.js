@@ -1,7 +1,7 @@
 // Consider using this ONLY for all LT configs and A-Frame and Side Wall A-Frame
 
 // I need this in a separate file by itself and to replace all_tarps.js with changes from arrays indices to objects props
-const allTarps = [
+const allTarpSizes = [
   {
     tarpCategory: "Rectangle",
     tarpRatio: "1:2",
@@ -88,6 +88,10 @@ const sitDepth = (height * 7) / 32;
 // Degree to radian conversion, have this in index.js
 const deg2Rad = Math.PI / 180;
 
+// CONFIGURATION ANGLES WILL VARY BY CONFIG CATEGORY
+const configAngles = [30, 50];
+// const configAngles = [37, 75];
+
 // Configuration specific constants (remove?)
 const configName = "Lean-To";
 const configType = "Lean-To";
@@ -107,27 +111,24 @@ let cover,
 // THIS DOES NOT CHANGE EXCEPT FOR A FEW CONFIGS: I will need a different component for when the code block below changes
 
 // Calculate sleep clearance and output tarps with len + 4 > height
-for (let i = 0; i < allTarps.length; i++) {
-  for (let j = 0; j < allTarps[i].tarpSizes.length; j++) {
-    let len = allTarps[i]["tarpSizes"][j][0];
+for (let i = 0; i < allTarpSizes.length; i++) {
+  for (let j = 0; j < allTarpSizes[i].tarpSizes.length; j++) {
+    let len = allTarpSizes[i]["tarpSizes"][j][0];
     sleepClr = len * 12 - height;
 
     if (sleepClr > 4) {
-      let tarpType = allTarps[i]["tarpCategory"] + " " + allTarps[i]["tarpRatio"];
+      let tarpType = allTarpSizes[i]["tarpCategory"] + " " + allTarpSizes[i]["tarpRatio"];
 
-      if (allTarps[i]["tarpSizes"].indexOf(allTarps[i]["tarpSizes"][j]) && !subset.includes(allTarps[i]["tarpSizes"][j])) {
+      if (allTarpSizes[i]["tarpSizes"].indexOf(allTarpSizes[i]["tarpSizes"][j]) && !subset.includes(allTarpSizes[i]["tarpSizes"][j])) {
         // Remove tarpType if not needed
-        subset.push([allTarps[i]["tarpSizes"][j], tarpType]);
+        subset.push([allTarpSizes[i]["tarpSizes"][j], tarpType]);
       }
     }
   }
 }
 console.log("subset: ", subset);
 
-// CONFIGURATION ANGLES WILL VARY BY CONFIG CATEGORY
 // I think I need a sub-component folder with the specifics, in the component folder I need this and the code block above, but how do I not have the following code block throw an error when it will have variables standing in for the values which will be in the sub-components?
-const configAngles = [30, 50];
-// const configAngles = [37, 75];
 
 // RIDGEHEIGHT AND COVER ARE THE ONLY VALUES THAT CHANGE FOR EACH CONFIG, AND THEY DO CHANGE FOR EVERY CONFIG - HOW TO I PREVERT DUPLICATE CODE?
 // Current config:
@@ -136,8 +137,6 @@ subset.forEach(item => {
   let len = item[0][0] * 12;
   let wid = item[0][1] * 12;
   let sleepClear = len - height;
-
-  // See top of COMPLETE.md for mults and angles constants
 
   for (let i = configAngles[1]; i >= configAngles[0]; i--) {
     ridgeHt = Math.trunc(Math.round(Math.sin(i * deg2Rad) * wid));

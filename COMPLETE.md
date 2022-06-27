@@ -1,4 +1,4 @@
-# COMPLETED CONFIG CODE BLOCKS FOR LEANT TO'S AND A-FRAMES
+# COMPLETED CONFIG CODE BLOCKS FOR LEAN TO'S AND A-FRAMES
 
 Have to figure out common code so that I can use only ONE component file for Each category: 1) Lean-to's, 2) A-Frames, 3) Diagonals, 4) Tents
 
@@ -648,11 +648,24 @@ These will be very similar to Lean-To (but make the condition + 6?)
 ## 15 Tube tent
 
 - [x] I will need to grab ONLY the 1:2 rectangle array in the first for loop block
-- [ ] I need to lose the for loop and just do i = 60
-- [ ] I need to group all 1:2 together if there are a lot of similarities
+- [x] I need to lose the for loop and just do i = 60
+- [ ] I need to group all 1:2 together if there are a lot of similarities (?)
 
 ```js
 // code
+for (let i = 0; i < allTarps[0].tarpSizes.length; i++) {
+  let len = allTarps[0]["tarpSizes"][i][0];
+  sleepClr = len * 12 - height;
+
+  if (sleepClr > 4) {
+    let tarpType = allTarps[0]["tarpCategory"] + " " + allTarps[0]["tarpRatio"];
+
+    if (allTarps[0]["tarpSizes"].indexOf(allTarps[0]["tarpSizes"][i]) && !subset.includes(allTarps[0]["tarpSizes"][i])) {
+      // Remove tarpType if not needed
+      subset.push([allTarps[0]["tarpSizes"][i], tarpType]);
+    }
+  }
+}
 ```
 
 ## 16 Open Tube Tent 50 (C-Fly 50)
