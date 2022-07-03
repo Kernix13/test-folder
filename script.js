@@ -88,16 +88,29 @@ const sitDepth = (height * 7) / 32;
 // Degree to radian conversion, have this in index.js
 const deg2Rad = Math.PI / 180;
 
-// CONFIGURATION ANGLES WILL VARY BY CONFIG CATEGORY
-const configAngles = [30, 50];
-// const configAngles = [37, 75];
-
 // Configuration specific constants (remove?)
 const configName = "Lean-To";
 const configType = "Lean-To";
 
 let subset = [];
 let sleepClr = 0;
+
+// THIS DOES NOT CHANGE EXCEPT FOR A FEW CONFIGS: I will need a different component for when the code block below changes
+// console.log(allTarpSizes[0]["tarpSizes"][0][1]);
+// Calculate sleep clearance and output tarps with len + 4 > height
+// exclude odd & squares tarps, the last 2 objects
+for (let i = 0; i < allTarpSizes.length - 2; i++) {
+  for (let j = 0; j < allTarpSizes[i].tarpSizes.length; j++) {
+    let len = allTarpSizes[i]["tarpSizes"][j][0];
+    sleepClr = len * 12 - height;
+
+    if (sleepClr > 4) {
+      let tarpType = allTarpSizes[i]["tarpCategory"] + " " + allTarpSizes[i]["tarpRatio"];
+      subset.push([allTarpSizes[i]["tarpSizes"][j], tarpType]);
+    }
+  }
+}
+console.log("subset: ", subset);
 
 let outputObj = [];
 let finalObj = [];
@@ -108,65 +121,42 @@ let cover,
   sitTarpHtClear,
   chairTarpHtClear = 0;
 
-// THIS DOES NOT CHANGE EXCEPT FOR A FEW CONFIGS: I will need a different component for when the code block below changes
+// CONFIGURATION ANGLES WILL VARY BY CONFIG CATEGORY
+// const configAngles = [75, 30];
+// const configAngles = [45, 60];
+const configAngles = [60, 33.3];
 
-// Calculate sleep clearance and output tarps with len + 4 > height
-for (let i = 0; i < allTarpSizes.length; i++) {
-  for (let j = 0; j < allTarpSizes[i].tarpSizes.length; j++) {
-    let len = allTarpSizes[i]["tarpSizes"][j][0];
-    sleepClr = len * 12 - height;
+// RIDGEHEIGHT AND COVER ARE THE ONLY VALUES THAT CHANGE FOR EACH CONFIG
+// console.log("Current config: Lean-To");
 
-    if (sleepClr > 4) {
-      let tarpType = allTarpSizes[i]["tarpCategory"] + " " + allTarpSizes[i]["tarpRatio"];
-
-      if (allTarpSizes[i]["tarpSizes"].indexOf(allTarpSizes[i]["tarpSizes"][j]) && !subset.includes(allTarpSizes[i]["tarpSizes"][j])) {
-        // Remove tarpType if not needed
-        subset.push([allTarpSizes[i]["tarpSizes"][j], tarpType]);
-      }
-    }
-  }
-}
-console.log("subset: ", subset);
-
-// I think I need a sub-component folder with the specifics, in the component folder I need this and the code block above, but how do I not have the following code block throw an error when it will have variables standing in for the values which will be in the sub-components?
-
-// RIDGEHEIGHT AND COVER ARE THE ONLY VALUES THAT CHANGE FOR EACH CONFIG, AND THEY DO CHANGE FOR EVERY CONFIG - HOW TO I PREVERT DUPLICATE CODE?
-// Current config:
-// console.log("Lean-To");
 subset.forEach(item => {
   let len = item[0][0] * 12;
   let wid = item[0][1] * 12;
-  let sleepClear = len - height;
 
-  for (let i = configAngles[1]; i >= configAngles[0]; i--) {
-    ridgeHt = Math.trunc(Math.round(Math.sin(i * deg2Rad) * wid));
+  let sleepClear = Math.round(wid - (0.375 * height) / (Math.tan(configAngles[0]) * 2) - height);
 
-    // Reduce the ridgeHeight to (height + 6) for really big tarps
-    ridgeHeight = Math.min(ridgeHt, height + 6);
+  ridgeHt = Math.round(Math.sin(configAngles[1] * deg2Rad) * len);
+  // Reduce the ridgeline height for really big tarps
+  ridgeHeight = Math.min(ridgeHt, height + 6);
 
-    // Calculate different "cover" values based on the 2 ridgeHeight calcs
-    if (ridgeHeight === height + 6) {
-      cover = Math.round(Math.sqrt(Math.pow(wid, 2) - Math.pow(ridgeHeight, 2)));
-    } else {
-      cover = Math.round(Math.cos(i * deg2Rad) * wid);
-    }
-
-    let sitCover = Math.round(cover - (sitDepth + 3));
-    let chairCover = Math.max(Math.round(cover - (chairDepth + 3)), 0);
-
-    let sitTarpHt = Math.round(Math.tan(i * deg2Rad) * sitCover);
-    let chairTarpHt = Math.round(Math.tan(i * deg2Rad) * chairCover);
-
-    coverClear = cover - bodyWidth;
-    sitTarpHtClear = sitTarpHt - sitHeight;
-    chairTarpHtClear = chairTarpHt - chairHeight;
-
-    outputObj = item.concat({ sleepClear, cover, coverClear, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: i });
-
-    if (sitTarpHtClear < 4 || chairTarpHtClear < 4) {
-      break;
-    }
+  // Calculate different "cover" values based on the 2 ridgeHeight calcs
+  if (ridgeHeight === height + 6) {
+    cover = Math.round(Math.sqrt(Math.pow(wid, 2) - Math.pow(ridgeHeight, 2)));
+  } else {
+    cover = Math.round(Math.cos(configAngles[1] * deg2Rad) * len);
   }
+
+  let sitCover = Math.round(cover - (sitDepth + 3));
+  let chairCover = Math.round(cover - (chairDepth + 3));
+
+  let sitTarpHt = Math.round(Math.tan(configAngles[1] * deg2Rad) * sitCover);
+  let chairTarpHt = Math.round(Math.tan(configAngles[1] * deg2Rad) * chairCover);
+
+  sitTarpHtClear = sitTarpHt - sitHeight;
+  chairTarpHtClear = chairTarpHt - chairHeight;
+
+  outputObj = item.concat({ sleepClear, cover, ridgeHeight, sitTarpHtClear, chairTarpHtClear, angle: configAngles[1] });
+
   finalObj.push(outputObj);
 });
 // GOT IT!

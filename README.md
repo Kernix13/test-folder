@@ -50,3 +50,50 @@ const sleepClear = (len - height) / 2;
 3. https://www.geeksforgeeks.org/how-to-create-an-object-from-two-arrays-in-javascript/,
 4. https://www.tutorialspoint.com/
 5. how-to-combine-two-arrays-into-an-array-of-objects-in-javascript,
+
+Removed this from the nested for loop:
+
+```js
+if (allTarpSizes[i]["tarpSizes"].indexOf(allTarpSizes[i]["tarpSizes"][j]) && !subset.includes(allTarpSizes[i]["tarpSizes"][j])) {
+  // Remove tarpType if not needed
+  subset.push([allTarpSizes[i]["tarpSizes"][j], tarpType]);
+}
+```
+
+### useId
+
+```jsx
+import {useId} from 'react';
+const id = useId();
+
+// in jsx
+<input id={id} type="text">
+```
+
+NOTE: **Forest tent** should be added to this list as well as **Half Pyramid**, both of which are A-Frames and variations of each other -
+
+| Config  | Sleep clear.   | Cover width             | Edge height             |
+| :------ | :------------- | :---------------------- | :---------------------- |
+| Plow Pt | `cos(x)*diag`  | `cos(x) * len * 2`      | `sin(x) * len`          |
+| Adir    | `hyp - ht`     | `cos(x) * hyp`          | `sin(x) * hyp`          |
+| Dia     | `diag - ht`    | `(cos(x)*diag/2) * 2`   | `sin(X)*(diag / 2)`     |
+| Hex Dia | `diag - ht`    | `(cos(45)*(len/2)) * 2` | `(sin(45)*(len/2)) * 2` |
+| Lavvu   | `wid / 3 - ht` | `sin(60)*(wid / 3)`     | `sin(x)*wid / 3`        |
+| Miners  | `.75*len - ht` | `0.678 * len`           | `0.857 * len`           |
+
+NEXT: Arrowhead Wedge 22.5, Half Cone Fly 22.5 | Side-Wall 1:2 60° 33.3°, Side-Wall 3:5 55° 29°, Side-Wall 2:3 58° 27° | Holden Tent 4:5 58° 30°, Holden Tent 3:4 55° 33°, Holden Tent 2:3 56° 38°, Holden Tent 3:5 45° 40°, Holden Tent 1:2 50° 45° | Tetra, Trapezoid | Bakers WS 27.5 |
+
+For ALL Side Wall LT and Holden Tent configs, sleepClear = `wid - (0.375ht/tan(x)*2)`, Cover = `cos(y) * len`, and ridgeHeight = `sin(y) * len`
+
+Notes:
+
+- Side-Wall LT - 33.3 deg lean for a 1:2 ratio tarp, sides create a 60 deg angle, folds are at the 1/3 marks on ridgeline so opening is 1/3 if sides are 90 deg to the ground ->
+  - MY CALCULATIONS ARE DEAD ON FOR THIS ONE - RE-CHECK HOLDEN AND BAKER WIND SHED CALCS
+  - `x` for sleep clearance is 60 degrees, `y` for cover & height is 33.3 degrees
+- 1:2 ration only configs: Lavvu, Tetra, Tube-Tent,
+- **Plow point** sleep clearance = `cos(x) * diag` | COVER - by eye, find equation
+- **Adirondack** sleep clearance = lean hypotenuse<sup>\*</sup> (hyp) = `(len/2) / sin(x) – (ht)`
+- **Holden Tents: how to calculate sleep length?**
+- Miner's Tent lean angle = 67.5 degrees. The decimals are approximations based on small model measurements. The actual geometry is 3D and so is too complicated for me to get the actual #'s. Always round up with this one.
+- Arrowhead Wedge lean angle = 22.5
+- Half Cone Fly lean angle = 22.5
